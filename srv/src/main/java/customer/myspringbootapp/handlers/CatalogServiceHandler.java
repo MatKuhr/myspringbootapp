@@ -49,28 +49,36 @@ public class CatalogServiceHandler implements EventHandler {
 
         final Map<Object, Map<String, Object>> result = new HashMap<>();
 
-        HttpDestination dest = DestinationAccessor.getDestination(DESTINATION_HEADER_KEY).asHttp();
+        try {
+            HttpDestination dest = DestinationAccessor.getDestination(DESTINATION_HEADER_KEY).asHttp();
 
-        final List<BusinessPartner> businessPartners = new DefaultGWSAMPLEBASICService().getAllBusinessPartner().top(10)
-                .executeRequest(dest);
+            final List<BusinessPartner> businessPartners = new DefaultGWSAMPLEBASICService().getAllBusinessPartner()
+                    .top(5).executeRequest(dest);
 
-        final List<cds.gen.catalogservice.BusinessPartner> capBusinessPartners = new ArrayList<>();
+            final List<cds.gen.catalogservice.BusinessPartner> capBusinessPartners = new ArrayList<>();
 
-        for( final BusinessPartner bp : businessPartners ) {
-            final cds.gen.catalogservice.BusinessPartner capBusinessPartner = com.sap.cds.Struct.create(cds.gen.catalogservice.BusinessPartner.class);
+            int i = 0;
+            for (final BusinessPartner bp : businessPartners) {
+                final cds.gen.catalogservice.BusinessPartner capBusinessPartner = com.sap.cds.Struct
+                        .create(cds.gen.catalogservice.BusinessPartner.class);
 
-            //capBusinessPartner.setBusinessPartnerID(bp.);
-            //capBusinessPartner.setFirstName(s4BusinessPartner.getFirstName());
-            //capBusinessPartner.setSurname(s4BusinessPartner.getLastName());
-            //capBusinessPartner.setId(s4BusinessPartner.getBusinessPartner());
-            //capBusinessPartner.setSourceDestination(destinationName);
+                i = i + 1;
+                capBusinessPartner.setBusinessPartnerID("010000000" + i);
+                capBusinessPartner.setCompanyName("SAP");
+                capBusinessPartner.setEmailAddress("info@acme.com");
+                capBusinessPartner.setPhoneNumber("474848848");
 
-            capBusinessPartners.add(capBusinessPartner);
+                capBusinessPartners.add(capBusinessPartner);
+            }
+
+            capBusinessPartners.forEach(capBusinessPartner -> {
+                result.put(capBusinessPartner.getBusinessPartnerID(), capBusinessPartner);
+            });
+
+        } catch (Exception e) {
+            log.info(e.getMessage());
+            System.out.println(e.getMessage());
         }
-
-        capBusinessPartners.forEach(capBusinessPartner -> {
-            result.put(capBusinessPartner.getBusinessPartnerID(), capBusinessPartner);
-        });
 
         context.setResult(result.values());
 
