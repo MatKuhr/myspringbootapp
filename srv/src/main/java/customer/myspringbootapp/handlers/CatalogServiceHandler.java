@@ -3,6 +3,7 @@ package customer.myspringbootapp.handlers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +24,6 @@ import cds.gen.catalogservice.CatalogService_;
 import cds.gen.gwsample_basic.BusinessPartnerSet;
 import cds.gen.catalogservice.Books;
 
-//import com.com.vdm.DefaultGWSAMPLEBASICService;
-//ODATA
 import com.vdm.services.DefaultGWSAMPLEBASICService;
 import com.vdm.namespaces.gwsamplebasic.BusinessPartner;
 
@@ -42,13 +41,36 @@ public class CatalogServiceHandler implements EventHandler {
 
     @On(event = CdsService.EVENT_READ, entity = "CatalogService.BusinessPartner")
     public void getBusinessPartners(CdsReadEventContext context) {
-        final Map<Object, Map<String, Object>> result = new HashMap<>();
-        final Map<String, Object> so = new HashMap<>();
+        log.info("Entering " + getClass().getSimpleName() + ":getBusinessPartners");
+        System.out.println("Entering " + getClass().getSimpleName() + ":getBusinessPartners");
 
         // Get name of destination for ECC
         final String DESTINATION_HEADER_KEY = "es5";
 
-        // WHAT TO PUT HERE????
+        final Map<Object, Map<String, Object>> result = new HashMap<>();
+
+        HttpDestination dest = DestinationAccessor.getDestination(DESTINATION_HEADER_KEY).asHttp();
+
+        final List<BusinessPartner> businessPartners = new DefaultGWSAMPLEBASICService().getAllBusinessPartner().top(10)
+                .executeRequest(dest);
+
+        final List<cds.gen.catalogservice.BusinessPartner> capBusinessPartners = new ArrayList<>();
+
+        for( final BusinessPartner bp : businessPartners ) {
+            final cds.gen.catalogservice.BusinessPartner capBusinessPartner = com.sap.cds.Struct.create(cds.gen.catalogservice.BusinessPartner.class);
+
+            //capBusinessPartner.setBusinessPartnerID(bp.);
+            //capBusinessPartner.setFirstName(s4BusinessPartner.getFirstName());
+            //capBusinessPartner.setSurname(s4BusinessPartner.getLastName());
+            //capBusinessPartner.setId(s4BusinessPartner.getBusinessPartner());
+            //capBusinessPartner.setSourceDestination(destinationName);
+
+            capBusinessPartners.add(capBusinessPartner);
+        }
+
+        capBusinessPartners.forEach(capBusinessPartner -> {
+            result.put(capBusinessPartner.getBusinessPartnerID(), capBusinessPartner);
+        });
 
         context.setResult(result.values());
 
