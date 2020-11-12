@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>myspringbootapp-parent</artifactId>
+		<groupId>customer</groupId>
+		<version>${revision}</version>
+	</parent>
+
+	<artifactId>myspringbootapp</artifactId>
+	<packaging>jar</packaging>
+
+	<name>myspringbootapp</name>
+
+	<!-- ACTUAL DEPENDENCIES -->
+	<dependencies>
+                <dependency>
+                <groupId>com.sap.cloud.sdk.datamodel</groupId>
+                <version>3.32.0</version>
+                <artifactId>odata-core</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>com.sap.cloud.sdk.cloudplatform</groupId>
+                <artifactId>scp-cf</artifactId>
+                <version>3.32.0</version>
+            </dependency>  
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>javax.inject</groupId>
+                <artifactId>javax.inject</artifactId>
+                <version>1</version>
+                <scope>provided</scope>
+            </dependency>
+
+		<dependency>
+			<groupId>com.sap.cds</groupId>
+			<artifactId>cds-starter-spring-boot-odata</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.xerial</groupId>
+			<artifactId>sqlite-jdbc</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.sap.cds</groupId>
+			<artifactId>cds-starter-cloudfoundry</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>${project.artifactId}</finalName>
+		<plugins>
+			<plugin>
+				<groupId>com.sap.cloud.sdk.datamodel</groupId>
+				<artifactId>odata-generator-maven-plugin</artifactId>
+				<version>3.32.0</version>
+				<executions>
+					<execution>
+						<id>generate-consumption</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<inputDirectory>${project.basedir}/external</inputDirectory>
+							<outputDirectory>${project.build.directory}/vdm</outputDirectory>
+							<deleteOutputDirectory>true</deleteOutputDirectory>
+                            <defaultBasePath>odata/v2/</defaultBasePath>
+							<packageName>com.vdm</packageName>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>${project.build.directory}/vdm</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+
+			<!-- SPRING BOOT PLUGIN -->
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>${spring.boot.version}</version>
+				<configuration>
+					<skip>false</skip>
+				</configuration>
+				<executions>
+					<execution>
+						<id>repackage</id>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+						<configuration>
+							<classifier>exec</classifier>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- STEPS TO BUILD CDS MODEL AND GENERATE POJOs -->
+			<plugin>
+				<groupId>com.sap.cds</groupId>
+				<artifactId>cds-maven-plugin</artifactId>
+				<version>${cds.services.version}</version>
+				<configuration>
+					<nodeVersion>${node.version}</nodeVersion>
+				</configuration>
+				<executions>
+					<execution>
+						<id>cds.clean</id>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+					</execution>
+
+					<execution>
+						<id>cds.install-node</id>
+						<goals>
+							<goal>install-node</goal>
+						</goals>
+						<configuration>
+							<skip>${cdsdk-global}</skip>
+							<downloadUrl>${node.url}</downloadUrl>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>install-cdsdk</id>
+						<goals>
+							<goal>install-cdsdk</goal>
+						</goals>
+						<configuration>
+							<skip>${cdsdk-global}</skip>
+							<version>${cdsdk.version}</version>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>cds.build</id>
+						<goals>
+							<goal>cds</goal>
+						</goals>
+						<configuration>
+							<commands>
+								<command>build</command>
+
+								<command>deploy --to sqlite --dry &gt;
+									"${project.basedir}/src/main/resources/schema.sql"</command>
+							</commands>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>cds.generate</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<basePackage>cds.gen</basePackage>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<!-- A profile that uses global installation of @sap/cds-dk -->
+		<profile>
+			<id>cdsdk-global</id>
+			<properties>
+				<cdsdk-global>true</cdsdk-global>
+			</properties>
+		</profile>
+	</profiles>
+</project>

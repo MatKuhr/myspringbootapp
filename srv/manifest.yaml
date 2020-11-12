@@ -1,0 +1,4 @@
+---
+applications:
+- name: myspringbootapp-srv
+  path: target/myspringbootapp-exec.jar

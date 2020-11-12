@@ -1,0 +1,89 @@
+## Generated mta.yaml based on template version 0.4.0
+## appName = myspringbootapp
+## language=java; multiTenant=false
+## approuter=
+_schema-version: '3.1'
+ID: myspringbootapp
+version: 1.0.0
+description: "myspringbootapp application"
+parameters:
+  enable-parallel-deployments: true
+   
+build-parameters:
+  before-all:
+   - builder: custom
+     commands:
+      - npm install --production
+      - npx -p @sap/cds-dk cds build --production
+
+modules:
+ # --------------------- SERVER MODULE ------------------------
+ - name: myspringbootapp-srv
+ # ------------------------------------------------------------
+   type: java
+   path: srv
+   build-parameters:
+     builder: custom
+     commands: [ mvn clean package ]
+     build-result: "target/*.[wj]ar"
+   requires:
+    # Resources extracted from CAP configuration
+    - name: uaa-myspringbootapp
+    - name: dest-myspringbootapp
+    - name: myspringbootapp-db
+      properties:
+        SPRING_PROFILES_ACTIVE: cloud
+   provides:
+    - name: srv-api      # required by consumers of CAP services (e.g. approuter)
+      properties:
+        srv-url: ${default-url}
+
+ # -------------------- SIDECAR MODULE ------------------------
+ - name: myspringbootapp-db-deployer
+ # ------------------------------------------------------------
+   type: hdb
+   path: db  
+   parameters:
+     buildpack: nodejs_buildpack
+   requires:
+    # 'hana' and 'xsuaa' resources extracted from CAP configuration
+    - name: myspringbootapp-db
+
+
+resources:
+ # services extracted from CAP configuration
+ # 'service-plan' can be configured via 'cds.requires.<name>.vcap.plan'
+# ------------------------------------------------------------
+ - name: myspringbootapp-db
+# ------------------------------------------------------------
+   type: com.sap.xs.hdi-container
+   parameters:
+     service: hana  # or 'hanatrial' on trial landscapes
+     service-plan: hdi-shared
+   properties:
+     hdi-service-name: ${service-name}
+
+# --------------------- XSUAA Service ------------------------
+ - name: uaa-myspringbootapp
+# ------------------------------------------------------------
+   type: org.cloudfoundry.managed-service
+   parameters:
+      path: ./xs-security.json
+      service-plan: application
+      service: xsuaa
+      
+# ------------------------------------------------------------
+ - name: dest-myspringbootapp
+# ------------------------------------------------------------
+   type: org.cloudfoundry.managed-service
+   parameters:
+      service-plan: lite
+      service: destination
+   
+# ------------------------------------------------------------
+ - name: conn-myspringbootapp
+# ------------------------------------------------------------
+   type: org.cloudfoundry.managed-service
+   parameters:
+      service-plan: lite
+      service: connectivity

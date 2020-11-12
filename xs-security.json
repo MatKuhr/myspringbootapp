@@ -1,0 +1,7 @@
+{
+    "xsappname": "myspringbootapp",
+    "tenant-mode": "dedicated",
+    "scopes": [],
+    "attributes": [],
+    "role-templates": []
+}
