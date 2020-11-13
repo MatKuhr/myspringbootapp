@@ -62,11 +62,10 @@ public class CatalogServiceHandler implements EventHandler {
                 final cds.gen.catalogservice.BusinessPartner capBusinessPartner = com.sap.cds.Struct
                         .create(cds.gen.catalogservice.BusinessPartner.class);
 
-                i = i + 1;
-                capBusinessPartner.setBusinessPartnerID("010000000" + i);
-                capBusinessPartner.setCompanyName("SAP");
-                capBusinessPartner.setEmailAddress("info@acme.com");
-                capBusinessPartner.setPhoneNumber("474848848");
+                capBusinessPartner.setBusinessPartnerID(bp.getBusinessPartnerID());
+                capBusinessPartner.setCompanyName(bp.getCompany());
+                capBusinessPartner.setEmailAddress(bp.getEMail());
+                capBusinessPartner.setPhoneNumber(bp.getPhoneNo());
 
                 capBusinessPartners.add(capBusinessPartner);
             }
