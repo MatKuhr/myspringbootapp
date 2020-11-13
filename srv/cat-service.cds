@@ -4,11 +4,8 @@ using {GWSAMPLE_BASIC as external} from './external/GWSAMPLE_BASIC.csn';
 service CatalogService {
     entity Books           as projection on my.Books;
 
-    entity BusinessPartner as
-        select from external.BusinessPartnerSet {
-            BusinessPartnerID,
-            CompanyName,
-            EmailAddress,
-            PhoneNumber
-        };
+    @cds.persistence.skip
+    entity BusinessPartner as projection on external.BusinessPartnerSet {
+        BusinessPartnerID, CompanyName, EmailAddress, PhoneNumber
+    };
 }

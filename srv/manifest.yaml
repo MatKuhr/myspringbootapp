@@ -2,3 +2,5 @@
 applications:
 - name: myspringbootapp-srv
   path: target/myspringbootapp-exec.jar
+  env:
+    SET_LOGGING_LEVEL: '{ROOT: DEBUG, com.sap.cloud.sdk: DEBUG, customer: DEBUG}'

@@ -19,6 +19,10 @@ import com.sap.cds.services.handler.annotations.On;
 import com.sap.cds.services.handler.annotations.ServiceName;
 import com.sap.cloud.sdk.cloudplatform.connectivity.DestinationAccessor;
 import com.sap.cloud.sdk.cloudplatform.connectivity.HttpDestination;
+import com.sap.cloud.sdk.datamodel.odata.client.exception.ODataDeserializationException;
+import com.sap.cloud.sdk.datamodel.odata.client.exception.ODataException;
+import com.sap.cloud.sdk.datamodel.odata.client.exception.ODataResponseException;
+import com.sap.cloud.sdk.datamodel.odata.client.exception.ODataServiceError;
 
 import cds.gen.catalogservice.CatalogService_;
 import cds.gen.gwsample_basic.BusinessPartnerSet;
@@ -40,7 +44,7 @@ public class CatalogServiceHandler implements EventHandler {
     }
 
     @On(event = CdsService.EVENT_READ, entity = "CatalogService.BusinessPartner")
-    public void getBusinessPartners(CdsReadEventContext context) {
+    public void getBusinessPartners(CdsReadEventContext context) throws ODataException {
         log.info("Entering " + getClass().getSimpleName() + ":getBusinessPartners");
         System.out.println("Entering " + getClass().getSimpleName() + ":getBusinessPartners");
 
@@ -53,14 +57,15 @@ public class CatalogServiceHandler implements EventHandler {
             HttpDestination dest = DestinationAccessor.getDestination(DESTINATION_HEADER_KEY).asHttp();
 
             final List<BusinessPartner> businessPartners = new DefaultGWSAMPLEBASICService().getAllBusinessPartner()
-                    .top(5).executeRequest(dest);
+                    .select(BusinessPartner.ALL_FIELDS).top(5).executeRequest(dest);
 
             final List<cds.gen.catalogservice.BusinessPartner> capBusinessPartners = new ArrayList<>();
 
-            int i = 0;
             for (final BusinessPartner bp : businessPartners) {
                 final cds.gen.catalogservice.BusinessPartner capBusinessPartner = com.sap.cds.Struct
                         .create(cds.gen.catalogservice.BusinessPartner.class);
+
+                System.out.println(bp.getBusinessPartnerID());
 
                 capBusinessPartner.setBusinessPartnerID(bp.getBusinessPartnerID());
                 capBusinessPartner.setCompanyName(bp.getCompany());
@@ -73,10 +78,10 @@ public class CatalogServiceHandler implements EventHandler {
             capBusinessPartners.forEach(capBusinessPartner -> {
                 result.put(capBusinessPartner.getBusinessPartnerID(), capBusinessPartner);
             });
-
-        } catch (Exception e) {
-            log.info(e.getMessage());
-            System.out.println(e.getMessage());
+        } catch (ODataDeserializationException e) {
+            log.error(e.getMessage());
+        } catch (ODataResponseException e) {
+            log.error(e.getMessage());
         }
 
         context.setResult(result.values());
