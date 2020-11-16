@@ -33,6 +33,7 @@ modules:
     - name: myspringbootapp-db
       properties:
         SPRING_PROFILES_ACTIVE: cloud
+        SET_LOGGING_LEVEL: '{ROOT: INFO, com.sap.cloud.sdk: DEBUG, customer: DEBUG, org.apache.http=ERROR, org.apache.http.wire=debug}'
    provides:
     - name: srv-api      # required by consumers of CAP services (e.g. approuter)
       properties:
