@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -14,34 +15,32 @@
 
 	<!-- ACTUAL DEPENDENCIES -->
 	<dependencies>
-                <dependency>
-                <groupId>com.sap.cloud.sdk.datamodel</groupId>
-                <version>3.32.0</version>
-                <artifactId>odata-core</artifactId>
-            </dependency>
-            <dependency>
-                <groupId>com.sap.cloud.sdk.cloudplatform</groupId>
-                <artifactId>scp-cf</artifactId>
-                <version>3.32.0</version>
-            </dependency>  
-            <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>javax.inject</groupId>
-                <artifactId>javax.inject</artifactId>
-                <version>1</version>
-                <scope>provided</scope>
-            </dependency>
+		<dependency>
+			<groupId>com.sap.cloud.sdk.datamodel</groupId>
+			<artifactId>odata-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.sap.cloud.sdk.cloudplatform</groupId>
+			<artifactId>scp-cf</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+			<version>1</version>
+			<scope>provided</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>com.sap.cds</groupId>
 			<artifactId>cds-starter-spring-boot-odata</artifactId>
 		</dependency>
-	    
-        <dependency>
+
+		<dependency>
 			<groupId>com.sap.cds</groupId>
 			<artifactId>cds-services-impl</artifactId>
 		</dependency>
@@ -80,7 +79,7 @@
 							<inputDirectory>${project.basedir}/external</inputDirectory>
 							<outputDirectory>${project.build.directory}/vdm</outputDirectory>
 							<deleteOutputDirectory>true</deleteOutputDirectory>
-                            <defaultBasePath>odata/v2/</defaultBasePath>
+							<defaultBasePath>odata/v2/</defaultBasePath>
 							<packageName>com.vdm</packageName>
 						</configuration>
 					</execution>

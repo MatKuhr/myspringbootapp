@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>customer</groupId>
@@ -19,7 +20,7 @@
 
 		<cdsdk.version>^1.8.5||^2</cdsdk.version>
 		<node.version>v12.16.1</node.version>
-		<node.url>https://nodejs.org/dist/</node.url>
+		<node.url>https://www.npmjs.com/</node.url>
 	</properties>
 
 	<modules>
@@ -43,6 +44,15 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-dependencies</artifactId>
 				<version>${spring.boot.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<!-- CLOUD SDK -->
+			<dependency>
+				<groupId>com.sap.cloud.sdk</groupId>
+				<artifactId>sdk-bom</artifactId>
+				<version>3.33.0</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -124,7 +134,7 @@
 									<regexMessage>"The artifactId should not contain underscores
 										(_) as this causes issues when deploying to Cloud Foundry."</regexMessage>
 								</requireProperty>
-								<reactorModuleConvergence/>
+								<reactorModuleConvergence />
 							</rules>
 							<fail>true</fail>
 						</configuration>
