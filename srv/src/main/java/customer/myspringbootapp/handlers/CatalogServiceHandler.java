@@ -20,6 +20,7 @@ import com.sap.cds.services.handler.annotations.ServiceName;
 import com.sap.cloud.sdk.cloudplatform.connectivity.DestinationAccessor;
 import com.sap.cloud.sdk.cloudplatform.connectivity.HttpDestination;
 import com.sap.cloud.sdk.datamodel.odata.client.exception.ODataException;
+import com.sap.cloud.sdk.datamodel.odata.client.exception.ODataResponseException;
 import com.sap.cloud.sdk.datamodel.odata.client.exception.ODataServiceErrorException;
 
 import cds.gen.catalogservice.CatalogService_;
@@ -58,6 +59,11 @@ public class CatalogServiceHandler implements EventHandler {
             businessPartners = new DefaultGwSampleBasicService().getAllBusinessPartner().top(5).executeRequest(dest);
         } catch (ODataServiceErrorException e) {
             log.error("The service responded with status code {} and an OData error: {}", e.getHttpCode(), e.getOdataError());
+            log.error("Initial request was: {}", e.getRequest());
+            throw e;
+        } catch (ODataResponseException e) {
+            log.error("The service responded with status code {}", e.getHttpCode());
+            log.error("Initial request was: {}", e.getRequest());
             throw e;
         }
 
